@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bodypump Tracker</title>
+  
+  <!-- Tailwind CSS für das Design laden -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React und ReactDOM laden -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel laden (Übersetzt den React-Code direkt im Browser) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Versteckt die Scrollbar im Dropdown/Menü, falls nötig */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <!-- Hier wird unsere React-App eingefügt -->
+  <div id="root"></div>
+
+  <!-- Unser React-Code -->
+  <script type="text/babel">
+    const { useState } = React;
+
+    // Konstanten für Muskelgruppen
+    const MUSCLES = {
+      CHEST: 'Brust',
+      BACK: 'Rücken (Lats)',
+      LOWER_BACK: 'Unterer Rücken',
+      TRAPS: 'Nacken & Trapez',
+      SHOULDERS: 'Schultern',
+      BICEPS: 'Bizeps',
+      TRICEPS: 'Trizeps',
+      ABS: 'Bauchmuskeln',
+      GLUTES: 'Gesäß',
+      QUADS: 'Oberschenkel (vorne)',
+      HAMSTRINGS: 'Oberschenkel (hinten)',
+      CALVES: 'Waden',
+      ALL: 'Ganzkörper'
+    };
+
+    // Bodypump Track-Datenbank
+    const TRACKS = [
+      { id: 1, name: '1. Aufwärmen (Warm-up)', desc: 'Mit leichtem Gewicht wird der gesamte Körper aufgewärmt. Fast jede große Muskelgruppe wird kurz durchbewegt.', targets: ['ALL'] },
+      { id: 2, name: '2. Kniebeugen (Squats)', desc: 'Der schwerste Track. Starker Fokus auf die Beine und den Po, um den Puls in die Höhe zu treiben.', targets: ['QUADS', 'GLUTES', 'HAMSTRINGS'] },
+      { id: 3, name: '3. Brust (Chest)', desc: 'Bankdrücken, Push-ups oder Fliegende. Zielt auf die Brustmuskulatur ab, wobei Schultern und Trizeps unterstützen.', targets: ['CHEST', 'SHOULDERS', 'TRICEPS'] },
+      { id: 4, name: '4. Rücken (Back)', desc: 'Kreuzheben und Rudern. Trainiert den gesamten Rückenbereich sowie die hintere Beinkette.', targets: ['BACK', 'LOWER_BACK', 'TRAPS', 'GLUTES', 'HAMSTRINGS'] },
+      { id: 5, name: '5. Trizeps (Triceps)', desc: 'Isolationsübungen für die Armrückseite (z.B. Kickbacks, Dips, Trizepsdrücken).', targets: ['TRICEPS'] },
+      { id: 6, name: '6. Bizeps (Biceps)', desc: 'Isolationsübungen für die Armvorderseite (Curls in verschiedenen Variationen).', targets: ['BICEPS'] },
+      { id: 7, name: '7. Ausfallschritte (Lunges)', desc: 'Intensives Training für die Beine, insbesondere die Oberschenkel und das Gesäß. Oft mit dem eigenen Körpergewicht.', targets: ['QUADS', 'GLUTES', 'HAMSTRINGS'] },
+      { id: 8, name: '8. Schultern (Shoulders)', desc: 'Seitheben, Frontheben, Überkopfdrücken und Push-ups. Brennt in den gesamten Schultern.', targets: ['SHOULDERS', 'TRAPS'] },
+      { id: 9, name: '9. Rumpf (Core/Abs)', desc: 'Crunches, Hover/Planks und Rotationsübungen für einen starken Rumpf.', targets: ['ABS', 'LOWER_BACK'] },
+      { id: 10, name: '10. Cooldown & Dehnen', desc: 'Entspannung und ausgiebiges Dehnen aller beanspruchten Muskelgruppen zur Erholung.', targets: ['ALL'] },
+    ];
+
+    // SVG Komponenten für den männlichen Körper
+    const FrontBody = ({ targets }) => {
+      const getFill = (m) => targets.includes('ALL') || targets.includes(m) ? '#ef4444' : '#e2e8f0';
+      const baseStyle = { transition: 'fill 0.3s ease', stroke: '#ffffff', strokeWidth: '1.5' };
+
+      return (
+        <svg viewBox="0 0 100 220" className="w-full h-auto drop-shadow-sm">
+          <circle cx="50" cy="16" r="12" fill="#cbd5e1" style={baseStyle} />
+          <rect x="45" y="25" width="10" height="10" rx="2" fill="#cbd5e1" style={baseStyle} />
+          <rect x="26" y="35" width="16" height="16" rx="6" fill={getFill('SHOULDERS')} style={baseStyle} />
+          <rect x="58" y="35" width="16" height="16" rx="6" fill={getFill('SHOULDERS')} style={baseStyle} />
+          <rect x="34" y="40" width="15" height="18" rx="4" fill={getFill('CHEST')} style={baseStyle} />
+          <rect x="51" y="40" width="15" height="18" rx="4" fill={getFill('CHEST')} style={baseStyle} />
+          <rect x="38" y="60" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="51" y="60" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="38" y="72" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="51" y="72" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="38" y="84" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="51" y="84" width="11" height="10" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="33" y="60" width="4" height="34" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="63" y="60" width="4" height="34" rx="2" fill={getFill('ABS')} style={baseStyle} />
+          <rect x="22" y="53" width="12" height="24" rx="5" fill={getFill('BICEPS')} style={baseStyle} />
+          <rect x="66" y="53" width="12" height="24" rx="5" fill={getFill('BICEPS')} style={baseStyle} />
+          <rect x="20" y="79" width="10" height="28" rx="4" fill="#cbd5e1" style={baseStyle} />
+          <rect x="70" y="79" width="10" height="28" rx="4" fill="#cbd5e1" style={baseStyle} />
+          <path d="M33 96 L67 96 L60 110 L40 110 Z" fill="#cbd5e1" style={baseStyle} />
+          <rect x="34" y="112" width="15" height="45" rx="6" fill={getFill('QUADS')} style={baseStyle} />
+          <rect x="51" y="112" width="15" height="45" rx="6" fill={getFill('QUADS')} style={baseStyle} />
+          <rect x="36" y="160" width="11" height="40" rx="4" fill={getFill('CALVES')} style={baseStyle} />
+          <rect x="53" y="160" width="11" height="40" rx="4" fill={getFill('CALVES')} style={baseStyle} />
+        </svg>
+      );
+    };
+
+    const BackBody = ({ targets }) => {
+      const getFill = (m) => targets.includes('ALL') || targets.includes(m) ? '#ef4444' : '#e2e8f0';
+      const baseStyle = { transition: 'fill 0.3s ease', stroke: '#ffffff', strokeWidth: '1.5' };
+
+      return (
+        <svg viewBox="0 0 100 220" className="w-full h-auto drop-shadow-sm">
+          <circle cx="50" cy="16" r="12" fill="#cbd5e1" style={baseStyle} />
+          <polygon points="45,26 55,26 62,38 38,38" fill={getFill('TRAPS')} style={baseStyle} />
+          <rect x="26" y="35" width="16" height="16" rx="6" fill={getFill('SHOULDERS')} style={baseStyle} />
+          <rect x="58" y="35" width="16" height="16" rx="6" fill={getFill('SHOULDERS')} style={baseStyle} />
+          <polygon points="34,40 66,40 62,80 38,80" fill={getFill('BACK')} style={baseStyle} />
+          <rect x="38" y="82" width="24" height="15" rx="3" fill={getFill('LOWER_BACK')} style={baseStyle} />
+          <rect x="22" y="53" width="12" height="26" rx="5" fill={getFill('TRICEPS')} style={baseStyle} />
+          <rect x="66" y="53" width="12" height="26" rx="5" fill={getFill('TRICEPS')} style={baseStyle} />
+          <rect x="20" y="81" width="10" height="28" rx="4" fill="#cbd5e1" style={baseStyle} />
+          <rect x="70" y="81" width="10" height="28" rx="4" fill="#cbd5e1" style={baseStyle} />
+          <rect x="33" y="100" width="16" height="24" rx="8" fill={getFill('GLUTES')} style={baseStyle} />
+          <rect x="51" y="100" width="16" height="24" rx="8" fill={getFill('GLUTES')} style={baseStyle} />
+          <rect x="34" y="126" width="15" height="40" rx="6" fill={getFill('HAMSTRINGS')} style={baseStyle} />
+          <rect x="51" y="126" width="15" height="40" rx="6" fill={getFill('HAMSTRINGS')} style={baseStyle} />
+          <rect x="35" y="168" width="13" height="35" rx="6" fill={getFill('CALVES')} style={baseStyle} />
+          <rect x="52" y="168" width="13" height="35" rx="6" fill={getFill('CALVES')} style={baseStyle} />
+        </svg>
+      );
+    };
+
+    function App() {
+      const [activeTrackId, setActiveTrackId] = useState(1);
+      const activeTrack = TRACKS.find(t => t.id === activeTrackId);
+
+      return (
+        <div className="min-h-screen font-sans text-slate-800 pb-8">
+          <header className="bg-slate-800 text-white p-3 shadow-md sticky top-0 z-20">
+            <div className="max-w-5xl mx-auto flex items-center gap-2">
+              <span className="text-xl">🏋️‍♂️</span>
+              <h1 className="text-lg font-bold tracking-tight">Bodypump Tracker</h1>
+            </div>
+          </header>
+
+          <main className="max-w-md mx-auto p-3 mt-2 flex flex-col gap-4">
+            
+            <div className="w-full flex flex-col gap-1">
+              <label htmlFor="trackSelect" className="font-bold text-slate-500 uppercase tracking-wider text-xs px-1">
+                Wähle einen Track
+              </label>
+              <select 
+                id="trackSelect"
+                value={activeTrackId}
+                onChange={(e) => setActiveTrackId(Number(e.target.value))}
+                className="w-full bg-white border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block p-2.5 shadow-sm outline-none"
+              >
+                {TRACKS.map(track => (
+                  <option key={track.id} value={track.id}>
+                    {track.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+              <h2 className="text-lg font-bold mb-2 text-slate-900">{activeTrack.name}</h2>
+              <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                {activeTrack.desc}
+              </p>
+              
+              <div className="space-y-1.5">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                  Fokus Muskelgruppen
+                </span>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {activeTrack.targets.map(target => (
+                    <span 
+                      key={target} 
+                      className="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-1 rounded text-xs font-bold shadow-sm"
+                    >
+                      {MUSCLES[target]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-3 h-3 rounded bg-red-500"></div>
+                <span className="text-xs font-medium text-slate-600">Beansprucht</span>
+                <div className="w-3 h-3 rounded bg-slate-300 ml-3"></div>
+                <span className="text-xs font-medium text-slate-600">Inaktiv</span>
+              </div>
+
+              <div className="flex justify-center gap-4 w-full">
+                <div className="w-1/2 max-w-[130px] flex flex-col items-center">
+                  <span className="text-slate-400 font-bold mb-2 tracking-wide uppercase text-[10px]">
+                    Vorne
+                  </span>
+                  <FrontBody targets={activeTrack.targets} />
+                </div>
+
+                <div className="w-1/2 max-w-[130px] flex flex-col items-center">
+                  <span className="text-slate-400 font-bold mb-2 tracking-wide uppercase text-[10px]">
+                    Hinten
+                  </span>
+                  <BackBody targets={activeTrack.targets} />
+                </div>
+              </div>
+            </div>
+
+          </main>
+        </div>
+      );
+    }
+
+    // App rendern
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
+
