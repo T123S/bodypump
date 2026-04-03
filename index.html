@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bodypump Tracker</title>
   
+  <!-- Eingebautes Favicon (SVG als Data-URI) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e293b'/><path d='M10 45h80v10H10z' fill='%23cbd5e1'/><rect x='20' y='25' width='12' height='50' rx='3' fill='%23ef4444'/><rect x='68' y='25' width='12' height='50' rx='3' fill='%23ef4444'/><rect x='34' y='30' width='8' height='40' rx='2' fill='%2394a3b8'/><rect x='58' y='30' width='8' height='40' rx='2' fill='%2394a3b8'/></svg>" type="image/svg+xml">
+  
   <!-- Tailwind CSS für das Design laden -->
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -133,8 +136,16 @@
       return (
         <div className="min-h-screen font-sans text-slate-800 pb-8">
           <header className="bg-slate-800 text-white p-3 shadow-md sticky top-0 z-20">
-            <div className="max-w-5xl mx-auto flex items-center gap-2">
-              <span className="text-xl">🏋️‍♂️</span>
+            <div className="max-w-5xl mx-auto flex items-center gap-3">
+              {/* Schöneres SVG Logo (Langhantel) */}
+              <svg className="w-8 h-8 drop-shadow-sm" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="20" fill="#0f172a" />
+                <path d="M10 45h80v10H10z" fill="#cbd5e1" />
+                <rect x="20" y="25" width="12" height="50" rx="3" fill="#ef4444" />
+                <rect x="68" y="25" width="12" height="50" rx="3" fill="#ef4444" />
+                <rect x="34" y="30" width="8" height="40" rx="2" fill="#94a3b8" />
+                <rect x="58" y="30" width="8" height="40" rx="2" fill="#94a3b8" />
+              </svg>
               <h1 className="text-lg font-bold tracking-tight">Bodypump Tracker</h1>
             </div>
           </header>
@@ -218,4 +229,5 @@
   </script>
 </body>
 </html>
+
 
